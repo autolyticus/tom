@@ -1,0 +1,142 @@
+#:import Toolbar kivymd.toolbar.Toolbar
+#:import ThemeManager kivymd.theming.ThemeManager
+#:import MDNavigationDrawer kivymd.navigationdrawer.MDNavigationDrawer
+#:import NavigationLayout kivymd.navigationdrawer.NavigationLayout
+#:import NavigationDrawerDivider kivymd.navigationdrawer.NavigationDrawerDivider
+#:import NavigationDrawerToolbar kivymd.navigationdrawer.NavigationDrawerToolbar
+#:import NavigationDrawerSubheader kivymd.navigationdrawer.NavigationDrawerSubheader
+#:import MDCheckbox kivymd.selectioncontrols.MDCheckbox
+#:import MDSwitch kivymd.selectioncontrols.MDSwitch
+#:import MDList kivymd.list.MDList
+#:import OneLineListItem kivymd.list.OneLineListItem
+#:import TwoLineListItem kivymd.list.TwoLineListItem
+#:import ThreeLineListItem kivymd.list.ThreeLineListItem
+#:import OneLineAvatarListItem kivymd.list.OneLineAvatarListItem
+#:import OneLineIconListItem kivymd.list.OneLineIconListItem
+#:import OneLineAvatarIconListItem kivymd.list.OneLineAvatarIconListItem
+#:import MDTextField kivymd.textfields.MDTextField
+#:import MDSpinner kivymd.spinner.MDSpinner
+#:import MDCard kivymd.card.MDCard
+#:import MDSeparator kivymd.card.MDSeparator
+#:import MDDropdownMenu kivymd.menu.MDDropdownMenu
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import colors kivymd.color_definitions.colors
+#:import SmartTile kivymd.grid.SmartTile
+#:import MDSlider kivymd.slider.MDSlider
+#:import MDTabbedPanel kivymd.tabs.MDTabbedPanel
+#:import MDTab kivymd.tabs.MDTab
+#:import MDProgressBar kivymd.progressbar.MDProgressBar
+#:import MDAccordion kivymd.accordion.MDAccordion
+#:import MDAccordionItem kivymd.accordion.MDAccordionItem
+#:import MDAccordionSubItem kivymd.accordion.MDAccordionSubItem
+#:import MDThemePicker kivymd.theme_picker.MDThemePicker
+#:import MDBottomNavigation kivymd.tabs.MDBottomNavigation
+#:import MDBottomNavigationItem kivymd.tabs.MDBottomNavigationItem
+
+NavigationLayout:
+    id: nav_layout
+    MDNavigationDrawer:
+        id: nav_drawer
+        NavigationDrawerIconButton:
+            icon: 'play'
+            text: 'Code Simulator'
+            on_release: root.ids.scr_mngr.current = 'run'
+        NavigationDrawerIconButton:
+            icon: 'lead-pencil'
+            text: 'Code Editor'
+            on_release: root.ids.scr_mngr.current = 'code'
+        NavigationDrawerIconButton:
+            icon: 'checkbox-blank-circle'
+            text: 'Themes'
+            on_release: root.ids.scr_mngr.current = 'theming'
+        NavigationDrawerToolbar:
+    BoxLayout:
+        orientation: 'vertical'
+        Toolbar:
+            id: toolbar
+            title: 'Tomasulo Simulator'
+            md_bg_color: app.theme_cls.primary_color
+            background_palette: 'Primary'
+            background_hue: '500'
+            left_action_items: [['menu', lambda x: root.toggle_nav_drawer()]]
+            # right_action_items: [['dots-vertical', lambda x: root.toggle_nav_drawer()]]
+        ScreenManager:
+            id: scr_mngr
+            Screen:
+                name: 'run'
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDLabel:
+                        font_style: 'Body1'
+                        theme_text_color: 'Primary'
+                        valign: 'top'
+                        halign: 'left'
+                        text_size: self.size
+                        font_name: 'data/fonts/RobotoMono-Regular.ttf'
+                        text: app.getTom(ASMCycle.text, ASMCode.text)
+                    MDLabel:
+                        font_style: 'Body1'
+                        theme_text_color: 'Primary'
+                        valign: 'top'
+                        halign: 'left'
+                        text_size: self.size
+                        text: 'All instructions take 1 cycle, except for:\nADD = 2\nMUL=10\nDIV=40\nDefault code is the example given in the PPT\n'
+                    BoxLayout:
+                        height: '1dp'
+                        MDSlider:
+                            id: ASMCycleSlider
+                            min: 0
+                            max: app.getTomMax(ASMCode.text) + 1
+                            value: 1
+                            on_touch_up: self.value, ASMCycle.text = int(self.value), str(int(self.value))
+                BoxLayout:
+                    orientation: 'horizontal'
+                    MDTextField:
+                        id: ASMCycle
+                        hint_text: 'Cycle Number'
+                        text: '1'
+                        disabled: True
+                        # on_text: ASMCycleSlider.value = int(ASMCycle.text)
+                    MDIconButton:
+                        icon: 'skip-backward'
+                        on_press: ASMCycle.text, ASMCycleSlider.value = str(int(ASMCycle.text) - 10), int(ASMCycle.text) - 10
+                    MDIconButton:
+                        icon: 'skip-previous'
+                        on_press: ASMCycle.text, ASMCycleSlider.value = str(int(ASMCycle.text) - 1), int(ASMCycle.text) - 1
+                    MDIconButton:
+                        icon: 'skip-next'
+                        on_press: ASMCycle.text, ASMCycleSlider.value = str(int(ASMCycle.text) + 1), int(ASMCycle.text) + 1
+                    MDIconButton:
+                        icon: 'skip-forward'
+                        on_press: ASMCycle.text, ASMCycleSlider.value = str(int(ASMCycle.text) + 10), int(ASMCycle.text) + 10
+
+                    # Label:
+            Screen:
+                name: 'code'
+                StackLayout:
+                    orientation: 'tb-lr'
+                    MDTextField:
+                        id: ASMCode
+                        multiline: True
+                        hint_text: 'Enter ASM Instructions'
+                        text: 'L.D F6 R2\nL.D F2 R3\nMUL.D F0 F2 F4\nSUB.D F8 F6 F2\nDIV.D F10 F0 F6\nADD.D F6 F8 F2'
+            Screen:
+                name: 'theming'
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: dp(80)
+                    center_y: self.parent.center_y
+                    MDRaisedButton:
+                        size_hint: None, None
+                        size: 3 * dp(48), dp(48)
+                        center_x: self.parent.center_x
+                        text: 'Change theme'
+                        on_release: MDThemePicker().open()
+                        opposite_colors: True
+                        pos_hint: {'center_x': 0.5}
+                    MDLabel:
+                        text: "Current: " + app.theme_cls.theme_style + ", " + app.theme_cls.primary_palette
+                        theme_text_color: 'Primary'
+                        pos_hint: {'center_x': 0.5}
+                        halign: 'center'
